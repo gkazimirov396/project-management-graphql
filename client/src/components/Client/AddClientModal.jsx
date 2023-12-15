@@ -40,8 +40,6 @@ function AddClientModal() {
       for (const err of error.graphQLErrors) {
         const path = err.message.split('"')[1];
         setError(path, {
-          type: 'deps',
-
           message: err.message.replace(`"${path}"`, 'This field'),
         });
       }
@@ -118,8 +116,7 @@ function AddClientModal() {
                   pattern: {
                     value:
                       /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/g,
-                    message:
-                      'The value you entered is not a valid phone number!',
+                    message: 'The value you entered is not a valid phone number!',
                   },
                 })}
               />

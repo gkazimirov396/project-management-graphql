@@ -22,7 +22,7 @@ function ProjectDetailed() {
       {!loading && !error && (
         <section className="grid grid-cols-3 p-5 mx-auto">
           <div className="flex flex-col gap-5">
-            <Link to=".." className="w-24 mb=4 btn btn-neutral btn-sm">
+            <Link to=".." className="w-24 btn btn-neutral btn-sm">
               Back
             </Link>
 

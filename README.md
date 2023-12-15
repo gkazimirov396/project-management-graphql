@@ -1,8 +1,12 @@
-# Getting Started with a Nodejs Note App
+# Getting Started with a GraphQL Project Management App
 
 ## Available Scripts
 
 In the project directory, you can run:
+
+### `npm run setup`
+
+Installs all the dependencies for both frontend and backend
 
 ### `npm start`
 
@@ -31,6 +35,7 @@ Create a .env file, following the structure of `.env.example` file, to store you
 PORT = Optional, defaults to 5000
 DB_USERNAME = Your MySQL User Name
 DB_PASS = Your MySQL User Password
+DB_NAME = The name of Your Collection
 ```
 
 ## Installation
@@ -38,7 +43,7 @@ DB_PASS = Your MySQL User Password
 To install and run this project - install dependencies using npm and then start your server:
 
 ```
-$ npm install
+$ npm run setup
 ```
 
 After you've installed the dependencies, run

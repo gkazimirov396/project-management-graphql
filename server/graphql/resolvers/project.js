@@ -39,7 +39,6 @@ const addProject = async (
   { newProject: { name, description, status, clientId } }
 ) => {
   validateInput(NewProjectSchema, { name, description, status, clientId });
-  console.log(status);
 
   const newProject = await Project.create({
     name,

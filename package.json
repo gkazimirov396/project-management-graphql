@@ -4,12 +4,10 @@
   "description": "",
   "scripts": {
     "start": "cd client && npm run dev",
-    "serve": "cd server && npm start"
+    "serve": "cd server && npm start",
+    "setup": "cd client && npm install && cd .. && cd server && npm install && cd .."
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "http-errors": "^2.0.0"
-  }
+  "license": "ISC"
 }
