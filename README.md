@@ -46,7 +46,7 @@ To install and run this project - install dependencies using npm and then start 
 $ npm run setup
 ```
 
-After you've installed the dependencies, run
+After you've installed the dependencies, run:
 
 ```
 $ npm run serve
