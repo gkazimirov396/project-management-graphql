@@ -1,6 +1,8 @@
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 
+import { useErrorBoundary } from '../hooks/useErrorBoundary';
+
 import { GET_PROJECT } from '../services/queries/project';
 
 import ClientInfo from '../components/Client/ClientInfo';
@@ -12,10 +14,12 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 function ProjectDetailed() {
   const { id } = useParams();
+  const { showBoundary } = useErrorBoundary();
+
   const { loading, error, data } = useQuery(GET_PROJECT, { variables: { id } });
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <p className="text-center text-error">{error.message}</p>;
+  if (error) return showBoundary(error);
 
   return (
     <>

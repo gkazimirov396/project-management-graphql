@@ -1,5 +1,7 @@
 import { useQuery } from '@apollo/client';
 
+import { useErrorBoundary } from '../hooks/useErrorBoundary';
+
 import { GET_CLIENTS } from '../services/queries/client';
 
 import ClientRow from '../components/Client/ClientRow';
@@ -8,10 +10,11 @@ import AddClientModal from '../components/Client/AddClientModal';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 function Clients() {
+  const { showBoundary } = useErrorBoundary();
   const { loading, error, data } = useQuery(GET_CLIENTS);
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <p className="text-center text-error">{error.message}</p>;
+  if (error) return showBoundary(error);
 
   return (
     <div className="flex flex-col gap-2">

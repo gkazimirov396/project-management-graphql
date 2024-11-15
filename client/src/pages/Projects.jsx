@@ -1,5 +1,7 @@
 import { useQuery } from '@apollo/client';
 
+import { useErrorBoundary } from '../hooks/useErrorBoundary';
+
 import { GET_PROJECTS } from '../services/queries/project';
 
 import ProjectCard from '../components/Project/ProjectCard';
@@ -8,10 +10,11 @@ import AddProjectModal from '../components/Project/AddProjectModal';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 function Projects() {
+  const { showBoundary } = useErrorBoundary();
   const { loading, error, data } = useQuery(GET_PROJECTS);
 
   if (loading) return <LoadingSpinner />;
-  if (error) return <p className="text-center text-error">{error.message}</p>;
+  if (error) return showBoundary(error);
 
   return (
     <div className="flex flex-col gap-4">

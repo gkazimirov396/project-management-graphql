@@ -5,6 +5,7 @@ import { useMutation, useQuery } from '@apollo/client';
 import { ADD_PROJECT } from '../../services/mutations/project';
 import { GET_PROJECTS } from '../../services/queries/project';
 import { GET_CLIENTS } from '../../services/queries/client';
+import { useErrorBoundary } from '../../hooks/useErrorBoundary';
 
 function AddProjectModal() {
   const {
@@ -16,6 +17,7 @@ function AddProjectModal() {
   } = useForm({
     mode: 'onBlur',
   });
+  const { showBoundary } = useErrorBoundary();
 
   const [addProject] = useMutation(ADD_PROJECT, {
     update(cache, { data: { addProject } }) {
@@ -47,7 +49,7 @@ function AddProjectModal() {
   };
 
   if (loading) return null;
-  if (error) return <p className="text-center text-error">{error.message}</p>;
+  if (error) return showBoundary(error);
 
   return (
     <>
@@ -112,9 +114,7 @@ function AddProjectModal() {
                     })}
                   ></textarea>
                   {errors.description && (
-                    <div className="text-error">
-                      {errors.description.message}
-                    </div>
+                    <div className="text-error">{errors.description.message}</div>
                   )}
                 </div>
                 <div className="mb-3">
