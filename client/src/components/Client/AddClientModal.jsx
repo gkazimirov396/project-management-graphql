@@ -45,10 +45,9 @@ function AddClientModal() {
       reset();
       modalRef.current.close();
     } catch (error) {
-      for (const err of error.graphQLErrors) {
-        const path = err.message.split('"')[1];
+      for (const { path, message } of error.graphQLErrors) {
         setError(path, {
-          message: err.message.replace(`"${path}"`, 'This field'),
+          message,
         });
       }
     }

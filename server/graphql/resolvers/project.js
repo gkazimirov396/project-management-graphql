@@ -7,7 +7,7 @@ import { validateInput } from '../../utils/validateInput.js';
 import {
   NewProjectSchema,
   UpdateProjectSchema,
-} from '../../validation/schemas.js';
+} from '../../validation/project.js';
 
 const getProjectClient = async (parent, args) => {
   const client = await Client.findByPk(parent.clientId);
@@ -38,7 +38,12 @@ const addProject = async (
   parent,
   { newProject: { name, description, status, clientId } }
 ) => {
-  validateInput(NewProjectSchema, { name, description, status, clientId });
+  await validateInput(NewProjectSchema, {
+    name,
+    description,
+    status,
+    clientId,
+  });
 
   const newProject = await Project.create({
     name,
@@ -54,7 +59,7 @@ const updateProject = async (
   parent,
   { updatedProject: { id, name, description, status } }
 ) => {
-  validateInput(UpdateProjectSchema, {
+  await validateInput(UpdateProjectSchema, {
     id,
     name,
     description,

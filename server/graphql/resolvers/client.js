@@ -3,7 +3,7 @@ import errors from 'http-errors';
 import { Client } from '../../models/Client.js';
 
 import { validateInput } from '../../utils/validateInput.js';
-import { NewClientSchema } from '../../validation/schemas.js';
+import { NewClientSchema } from '../../validation/client.js';
 
 const getAllClients = async (parent, args) => {
   const clients = await Client.findAll();
@@ -21,7 +21,7 @@ const getClientById = async (parent, args) => {
 };
 
 const addClient = async (parent, { newClient: { name, email, phone } }) => {
-  validateInput(NewClientSchema, { name, email, phone });
+  await validateInput(NewClientSchema, { name, email, phone });
 
   const newClient = await Client.create({
     name,

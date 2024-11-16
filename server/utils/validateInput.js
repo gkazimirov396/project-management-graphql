@@ -1,10 +1,16 @@
 import { GraphQLError } from 'graphql';
 
-export const validateInput = (schema, value) => {
-  const validationResult = schema.validate(value);
-  if (validationResult.error) {
-    const error = new GraphQLError(validationResult.error.message, {
-      extensions: { status: 422, payload: validationResult.error.details },
+export const validateInput = async (schema, value) => {
+  const validationResult = await schema.safeParseAsync(value);
+  if (!validationResult.success) {
+    const validationErrors = validationResult.error.format();
+    const path = Object.keys(validationErrors)[1];
+
+    const error = new GraphQLError(validationErrors[path]._errors[0], {
+      extensions: {
+        status: 422,
+        path,
+      },
     });
 
     throw error;

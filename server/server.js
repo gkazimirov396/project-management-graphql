@@ -32,14 +32,14 @@ app.use(
       }
       console.error(err.originalError);
 
-      const payload = err.originalError.payload;
+      const path = err.originalError.extensions.path;
       const message = err.message || 'An error occurred.';
-      const status = err.originalError.status || 500;
+      const status = err.originalError.extensions.status || 500;
 
       return {
         message,
         status,
-        payload,
+        path,
       };
     },
   })
