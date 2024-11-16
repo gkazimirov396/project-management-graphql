@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
@@ -29,7 +27,7 @@ function EditProjectForm({ project }) {
     register,
     handleSubmit,
     setError,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     mode: 'onBlur',
     resolver: zodResolver(AddProjectSchema),
@@ -40,7 +38,6 @@ function EditProjectForm({ project }) {
     },
   });
   const navigate = useNavigate();
-  const [isDisabled, setIsDisabled] = useState(true);
 
   const [updateProject] = useMutation(UPDATE_PROJECT, {
     onCompleted: () => navigate('/projects'),
@@ -73,40 +70,45 @@ function EditProjectForm({ project }) {
   return (
     <div className="mt-5">
       <h3>Update Project</h3>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        onInput={() => setIsDisabled(false)}
-      >
+
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-3">
           <label className="label" htmlFor="name">
             Name
           </label>
+
           <input
             type="text"
             className="w-full max-w-xs form-control input input-bordered input-sm"
             id="name"
             {...register('name')}
           />
+
           {errors.name && <div className="text-error">{errors.name.message}</div>}
         </div>
+
         <div className="mb-3">
           <label className="label" htmlFor="description">
             Description
           </label>
+
           <textarea
             className="w-full max-w-xs form-control textarea textarea-bordered"
             id="description"
             rows={5}
             {...register('description')}
           ></textarea>
+
           {errors.description && (
             <div className="text-error">{errors.description.message}</div>
           )}
         </div>
+
         <div className="mb-3">
           <label className="label" htmlFor="status">
             Status
           </label>
+
           <select
             id="status"
             defaultValue="new"
@@ -117,6 +119,7 @@ function EditProjectForm({ project }) {
             <option value="progress">In Progress</option>
             <option value="completed">Completed</option>
           </select>
+
           {errors.status && (
             <div className="text-error">{errors.status.message}</div>
           )}
@@ -124,7 +127,7 @@ function EditProjectForm({ project }) {
 
         <button
           type="submit"
-          disabled={isDisabled}
+          disabled={!isDirty}
           className="text-white btn btn-primary hover:opacity-90"
         >
           Save Changes
