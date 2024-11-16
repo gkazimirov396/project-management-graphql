@@ -25,7 +25,7 @@ function Clients() {
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Phone</th>
+              <th>Phone Number</th>
               <th></th>
             </tr>
           </thead>

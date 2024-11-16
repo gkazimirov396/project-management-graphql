@@ -1,9 +1,14 @@
+import { useRef } from 'react';
+
 import { User, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import { ADD_CLIENT } from '../../services/mutations/client';
 import { GET_CLIENTS } from '../../services/queries/client';
+
+import { AddClientSchema } from '../../schema/addClient';
 
 function AddClientModal() {
   const {
@@ -14,6 +19,7 @@ function AddClientModal() {
     formState: { errors },
   } = useForm({
     mode: 'onBlur',
+    resolver: zodResolver(AddClientSchema),
   });
 
   const [addClient] = useMutation(ADD_CLIENT, {
@@ -27,6 +33,8 @@ function AddClientModal() {
     },
   });
 
+  const modalRef = useRef(null);
+
   const onSubmit = async formData => {
     try {
       const result = await addClient({
@@ -35,7 +43,7 @@ function AddClientModal() {
       console.log(result);
 
       reset();
-      document.getElementById('addClient').close();
+      modalRef.current.close();
     } catch (error) {
       for (const err of error.graphQLErrors) {
         const path = err.message.split('"')[1];
@@ -50,7 +58,7 @@ function AddClientModal() {
     <>
       <button
         className="self-end text-white w-fit btn btn-secondary hover:opacity-90"
-        onClick={() => document.getElementById('addClient').showModal()}
+        onClick={() => modalRef.current.showModal()}
       >
         <div className="flex items-center">
           <User className="mr-4" />
@@ -58,7 +66,7 @@ function AddClientModal() {
         </div>
       </button>
 
-      <dialog id="addClient" className="modal">
+      <dialog id="addClient" className="modal" ref={modalRef}>
         <div className="modal-box">
           <h5 className="text-3xl">Add Client</h5>
           <form method="dialog" className="mb-6">
@@ -66,6 +74,7 @@ function AddClientModal() {
               <X />
             </button>
           </form>
+
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-3">
               <label className="label" htmlFor="name">
@@ -75,9 +84,7 @@ function AddClientModal() {
                 type="text"
                 className="w-full max-w-xs form-control input input-bordered input-sm"
                 id="name"
-                {...register('name', {
-                  required: 'This field is required!',
-                })}
+                {...register('name')}
               />
               {errors.name && (
                 <div className="text-error">{errors.name.message}</div>
@@ -91,13 +98,7 @@ function AddClientModal() {
                 type="email"
                 className="w-full max-w-xs form-control input input-bordered input-sm"
                 id="email"
-                {...register('email', {
-                  required: 'This field is required!',
-                  pattern: {
-                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-                    message: 'The value you entered is not a valid e-mail!',
-                  },
-                })}
+                {...register('email')}
               />
               {errors.email && (
                 <div className="text-error">{errors.email.message}</div>
@@ -111,14 +112,7 @@ function AddClientModal() {
                 type="tel"
                 className="w-full max-w-xs form-control input input-bordered input-sm"
                 id="phone"
-                {...register('phone', {
-                  required: 'This field is required!',
-                  pattern: {
-                    value:
-                      /^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$/g,
-                    message: 'The value you entered is not a valid phone number!',
-                  },
-                })}
+                {...register('phone')}
               />
               {errors.phone && (
                 <div className="text-error">{errors.phone.message}</div>
@@ -127,7 +121,7 @@ function AddClientModal() {
 
             <button
               type="submit"
-              className="text-white btn btn-secondary hover:opacity-90"
+              className="mt-4 text-white btn btn-secondary hover:opacity-90"
             >
               Submit
             </button>

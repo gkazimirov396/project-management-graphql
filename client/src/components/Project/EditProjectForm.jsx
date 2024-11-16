@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 import { useForm } from 'react-hook-form';
@@ -7,6 +8,8 @@ import PropTypes from 'prop-types';
 
 import { GET_PROJECT } from '../../services/queries/project';
 import { UPDATE_PROJECT } from '../../services/mutations/project';
+
+import { AddProjectSchema } from '../../schema/addProject';
 
 const formatProjectStatus = status => {
   switch (status) {
@@ -29,6 +32,7 @@ function EditProjectForm({ project }) {
     formState: { errors },
   } = useForm({
     mode: 'onBlur',
+    resolver: zodResolver(AddProjectSchema),
     defaultValues: {
       name: project.name,
       description: project.description,
@@ -53,6 +57,7 @@ function EditProjectForm({ project }) {
           },
         },
       });
+
       console.log(result);
     } catch (error) {
       console.error(error);
@@ -80,13 +85,9 @@ function EditProjectForm({ project }) {
             type="text"
             className="w-full max-w-xs form-control input input-bordered input-sm"
             id="name"
-            {...register('name', {
-              required: 'This field is required!',
-            })}
+            {...register('name')}
           />
-          {errors.name && (
-            <div className="text-error">{errors.name.message}</div>
-          )}
+          {errors.name && <div className="text-error">{errors.name.message}</div>}
         </div>
         <div className="mb-3">
           <label className="label" htmlFor="description">
@@ -96,18 +97,7 @@ function EditProjectForm({ project }) {
             className="w-full max-w-xs form-control textarea textarea-bordered"
             id="description"
             rows={5}
-            {...register('description', {
-              required: 'This field is required!',
-              minLength: {
-                value: 3,
-                message: 'This field should be at least 3 characters long!',
-              },
-              maxLength: {
-                value: 100,
-                message:
-                  'This field should not be more than 100 characters long!',
-              },
-            })}
+            {...register('description')}
           ></textarea>
           {errors.description && (
             <div className="text-error">{errors.description.message}</div>
@@ -121,11 +111,7 @@ function EditProjectForm({ project }) {
             id="status"
             defaultValue="new"
             className="w-full max-w-xs form-control select select-bordered select-sm"
-            {...register('status', {
-              validate: val =>
-                ['new', 'progress', 'completed'].includes(val) ||
-                'This field only accepts "new", "progress", "completed" as values!',
-            })}
+            {...register('status')}
           >
             <option value="new">Not Started</option>
             <option value="progress">In Progress</option>

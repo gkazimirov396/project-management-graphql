@@ -1,23 +1,21 @@
+import { useRef } from 'react';
+
+import { z } from 'zod';
 import { List, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@apollo/client';
+
+import { useErrorBoundary } from '../../hooks/useErrorBoundary';
 
 import { ADD_PROJECT } from '../../services/mutations/project';
 import { GET_PROJECTS } from '../../services/queries/project';
 import { GET_CLIENTS } from '../../services/queries/client';
-import { useErrorBoundary } from '../../hooks/useErrorBoundary';
+
+import { AddProjectSchema } from '../../schema/addProject';
 
 function AddProjectModal() {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    formState: { errors },
-  } = useForm({
-    mode: 'onBlur',
-  });
-  const { showBoundary } = useErrorBoundary();
+  const { loading, error, data } = useQuery(GET_CLIENTS);
 
   const [addProject] = useMutation(ADD_PROJECT, {
     update(cache, { data: { addProject } }) {
@@ -29,7 +27,25 @@ function AddProjectModal() {
     },
   });
 
-  const { loading, error, data } = useQuery(GET_CLIENTS);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors },
+  } = useForm({
+    mode: 'onBlur',
+    resolver: zodResolver(
+      AddProjectSchema.extend({
+        clientId: z.custom(
+          val => data?.clients.map(client => client.id).includes(val),
+          { message: 'The value you entered is not a valid client!' }
+        ),
+      })
+    ),
+  });
+  const { showBoundary } = useErrorBoundary();
+  const modalRef = useRef(null);
 
   const onSubmit = async formData => {
     try {
@@ -37,7 +53,7 @@ function AddProjectModal() {
       console.log(result);
 
       reset();
-      document.getElementById('addProject').close();
+      modalRef.current.close();
     } catch (error) {
       for (const err of error.graphQLErrors) {
         const path = err.message.split('"')[1];
@@ -58,7 +74,7 @@ function AddProjectModal() {
           <button
             type="button"
             className="self-end text-white w-fit btn btn-primary hover:opacity-90"
-            onClick={() => document.getElementById('addProject').showModal()}
+            onClick={() => modalRef.current.showModal()}
           >
             <div className="flex items-center">
               <List className="mr-4" />
@@ -66,7 +82,7 @@ function AddProjectModal() {
             </div>
           </button>
 
-          <dialog id="addProject" className="modal">
+          <dialog id="addProject" className="modal" ref={modalRef}>
             <div className="modal-box">
               <h5 className="text-3xl">Add Project</h5>
               <form method="dialog" className="mb-6">
@@ -74,6 +90,7 @@ function AddProjectModal() {
                   <X />
                 </button>
               </form>
+
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="mb-3">
                   <label className="label" htmlFor="name">
@@ -83,9 +100,7 @@ function AddProjectModal() {
                     type="text"
                     className="w-full max-w-xs form-control input input-bordered input-sm"
                     id="name"
-                    {...register('name', {
-                      required: 'This field is required!',
-                    })}
+                    {...register('name')}
                   />
                   {errors.name && (
                     <div className="text-error">{errors.name.message}</div>
@@ -99,19 +114,7 @@ function AddProjectModal() {
                     className="w-full max-w-xs form-control textarea textarea-bordered"
                     id="description"
                     rows={5}
-                    {...register('description', {
-                      required: 'This field is required!',
-                      minLength: {
-                        value: 3,
-                        message:
-                          'This field should be at least 3 characters long!',
-                      },
-                      maxLength: {
-                        value: 100,
-                        message:
-                          'This field should not be more than 100 characters long!',
-                      },
-                    })}
+                    {...register('description')}
                   ></textarea>
                   {errors.description && (
                     <div className="text-error">{errors.description.message}</div>
@@ -125,11 +128,7 @@ function AddProjectModal() {
                     id="status"
                     defaultValue="new"
                     className="w-full max-w-xs form-control select select-bordered select-sm"
-                    {...register('status', {
-                      validate: val =>
-                        ['new', 'progress', 'completed'].includes(val) ||
-                        'The value you entered is not a valid client!',
-                    })}
+                    {...register('status')}
                   >
                     <option value="new">Not Started</option>
                     <option value="progress">In Progress</option>
@@ -147,12 +146,7 @@ function AddProjectModal() {
                   <select
                     id="clientId"
                     className="w-full max-w-xs form-control select select-bordered select-sm"
-                    {...register('clientId', {
-                      required: 'This field is required!',
-                      validate: val =>
-                        data.clients.map(client => client.id).includes(val) ||
-                        'This field only accepts "new", "progress", "completed" as values!',
-                    })}
+                    {...register('clientId')}
                   >
                     <option value="">Select Client</option>
                     {data.clients.map(client => (
@@ -168,7 +162,7 @@ function AddProjectModal() {
 
                 <button
                   type="submit"
-                  className="text-white btn btn-primary hover:opacity-90"
+                  className="mt-4 text-white btn btn-primary hover:opacity-90"
                 >
                   Submit
                 </button>
