@@ -1,11 +1,15 @@
-import { Component } from 'react';
+import { Component, createElement } from 'react';
 
 import PropTypes from 'prop-types';
 
 class ErrorBoundary extends Component {
   static propTypes = {
-    fallback: PropTypes.func.isRequired,
     children: PropTypes.node.isRequired,
+    fallback: PropTypes.oneOfType([
+      PropTypes.func,
+      PropTypes.node,
+      PropTypes.instanceOf(Component),
+    ]).isRequired,
   };
 
   state = { hasError: false, error: null };
@@ -31,7 +35,7 @@ class ErrorBoundary extends Component {
     if (this.state.hasError && this.state.error !== null) {
       const Fallback = this.props.fallback;
 
-      return <Fallback error={this.state.error} />;
+      return createElement(Fallback, { error: this.state.error });
     }
 
     return this.props.children;
